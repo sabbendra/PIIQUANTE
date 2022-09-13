@@ -16,7 +16,7 @@ const productSchema = new mongoose.Schema({
 })
 
 const Product = mongoose.model("Product", productSchema)
-
+//on va récupérer toutes les sauces
 function getSauces(req, res){
         Product.find({})
         .then((Product) => res.send(Product))
@@ -34,8 +34,11 @@ function getSauceById(req, res) {
 //pour créer une sauce, res c'est la réponse qu'on reçoit
 function createSauces(req, res){
 const { body, file } = req
+console.log({body, file})
 const { fileName } = file
+
 const sauce = JSON.parse(body.sauce)
+console.log("sauce", sauce)
 const { name, manufacturer, description, mainPepper, heat, userId } = sauce
 
 function makeImageUrl(req, fileName) {
@@ -56,10 +59,12 @@ function makeImageUrl(req, fileName) {
  })
  product
  .save()
- .then((message) =>  {
-    res.status(201).send( message );
+ .then((message) => {
+    res.status(201).send(message);
     return console.log("produit enregisté", message)
  })
  .catch(console.error)
 }
-module.exports = { getSauces, createSauces, getSauceById }
+module.exports = { getSauces, createSauces, getSauceById } 
+
+

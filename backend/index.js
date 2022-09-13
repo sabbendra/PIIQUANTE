@@ -19,7 +19,7 @@ app.post("/api/auth/login", logUser)
 //authenticateUser est un middlew il se loge entre la requête et la réponse
 app.get("/api/sauces", authenticateUser, getSauces)
 //apres l'authentification, on va récupérer un fichier image et ensuite on va créer une sauce
-app.post("/api/sauces", authenticateUser, upload.single("images"), createSauces)
+app.post("/api/sauces", authenticateUser, upload.single("image"), createSauces)
 app.get("/api/sauces/:id", authenticateUser, getSauceById)
 
 app.get("/", (req, res) => res.send("hello world"))
@@ -29,4 +29,4 @@ console.log(__dirname)
 console.log(path.join(__dirname,"images"))
 
 app.use("/images", express.static(path.join(__dirname, "images")))
-app.listen(port, () => console.log('Listening on port' + port))
+app.listen(port, () => console.log("Listening on port" + port))
