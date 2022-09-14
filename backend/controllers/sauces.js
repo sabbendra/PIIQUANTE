@@ -11,8 +11,8 @@ const productSchema = new mongoose.Schema({
     heat: { type: Number, required: true },
     likes: { type: Number, default:0 },
     dislikes: { type: Number, default:0 },
-    userLiked: { type:[String] },
-    userDisliked: { type:[String] }
+    usersLiked: { type:[String], required: false },
+    usersDisliked: { type:[String], required: false }
 })
 
 const Product = mongoose.model("Product", productSchema)
@@ -46,12 +46,12 @@ const { body, file } = req
 console.log({body, file})
 const { fileName } = file
 
-const sauce = JSON.parse(body.sauce)
+const sauce = JSON.parse(req.body.sauce) // AJOUT DE REQ
 console.log("sauce", sauce)
 const { name, manufacturer, description, mainPepper, heat, userId } = sauce
 
 function makeImageUrl(req, fileName) {
-    return req.protocol + "://" + req.get("host") + "/images/" + fileName
+   return req.protocol + "://" + req.get("host") + "/images/" + fileName
 }
  const product = new Product({
     userId: userId,
@@ -63,8 +63,8 @@ function makeImageUrl(req, fileName) {
     heat: heat,
     likes: 0,
     dislikes: 0,
-    userLiked: [],
-    userDisliked: []
+    usersLiked: [],
+    usersDisliked: []
  })
  product
  .save()
