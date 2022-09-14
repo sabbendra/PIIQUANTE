@@ -19,7 +19,7 @@ const Product = mongoose.model("Product", productSchema)
 
 //on va récupérer toutes les sauces
 function getSauces(req, res){
-   // authenticateUser(req,res)
+    //si l'user est authentifié on fait un Product.find
     console.log("le token a été validé, nous sommes getSauces")
     //on va récupérer les produits (products)
         Product.find({})

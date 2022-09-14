@@ -6,7 +6,7 @@ function authenticateUser(req, res, next) {
 
     //si l'autorisation n'est pas bonne on renseigne un message invalid    
     const header = req.header("Authorization")
-    console.log(header)
+    
         if (header == null) return res.status(403).send({ message: "Invalid" })
 
         const token = header.split(" ")[1]
