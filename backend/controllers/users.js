@@ -1,3 +1,4 @@
+//on importe user depuis mongo
 const {User} = require ("../mongo")//on veut le User dans le fichier mongo
 const bcrypt = require("bcrypt")
 const jwt = require ("jsonwebtoken")
@@ -23,16 +24,15 @@ async function createUser(req, res) {
   }
 
   async function logUser(req, res) {
-   
     try {
     const email = req.body.email
     const password = req.body.password
     
-    //pour trouver une personne dans la base de donnée
+    //pour trouver une personne qui correspond a cet email dans la base de donnée
     const user = await User.findOne({ email: email })
     console.log(user)
     const isPasswordOk = await bcrypt.compare(password, user.password)
-    //si le password n'est pas ok on envoie un 403
+    //si le password n'est pas bon on envoie un 403
     if(!isPasswordOk){
         res.status(403).send({ message: "Mot de passe incorrect"})
     }

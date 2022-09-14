@@ -9,27 +9,36 @@ const productSchema = new mongoose.Schema({
     mainPepper: { type: String, required: true },
     imageUrl: { type: String, required: true }, 
     heat: { type: Number, required: true },
-    likes: { type: Number, required: true },
-    dislikes: { type: Number },
-    userLiked: [String],
-    userDisliked: [String]
+    likes: { type: Number, default:0 },
+    dislikes: { type: Number, default:0 },
+    userLiked: { type:[String] },
+    userDisliked: { type:[String] }
 })
 
 const Product = mongoose.model("Product", productSchema)
+
 //on va récupérer toutes les sauces
 function getSauces(req, res){
+   // authenticateUser(req,res)
+    console.log("le token a été validé, nous sommes getSauces")
+    //on va récupérer les produits (products)
         Product.find({})
-        .then((Product) => res.send(Product))
-        .catch(error => res.status(500).send(error)) 
-        
+        .then(products => res.send( products ))
+        .catch(error => res.status(500).send(error))
+     
 }
 
 function getSauceById(req, res) { 
-    const { id } = req.params
-    Product.findOne({id}) 
-        .then((Product) => res.send(Product))
-        .catch(console.error)               
+    console.log(req.params)
+    const id = req.params.id
+    Product.findById(id)
+            .then(product =>  {
+            console.log("prod avec cet id:", product)
+            res.send(product)
+            })
+            .catch(console.error)              
 }
+       
 
 //pour créer une sauce, res c'est la réponse qu'on reçoit
 function createSauces(req, res){
@@ -60,7 +69,7 @@ function makeImageUrl(req, fileName) {
  product
  .save()
  .then((message) => {
-    res.status(201).send(message);
+    res.status(201).send({ message: message });
     return console.log("produit enregisté", message)
  })
  .catch(console.error)

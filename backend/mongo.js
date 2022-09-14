@@ -14,6 +14,7 @@ mongoose
 .catch(() => console.log("Connexion à MongoDB échouée !"));
 
 const userSchema = new mongoose.Schema({
+  //on met unique pour aller vérfier si l'email est unique
   email: {type: String, required: true, unique: true},
   password: {type: String, required: true}
 })
