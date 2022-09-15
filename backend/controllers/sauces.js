@@ -1,7 +1,8 @@
 //pour vérifier le token
 const mongoose = require("mongoose")
 //pour supprimer l'image en local
-const unlink = require ("fs").promises.unlink
+//const unlink = require ("fs").promises.unlink
+const {unlink} = require ("fs/promises")
 
 const productSchema = new mongoose.Schema({
     userId: { type: String, required: true },
@@ -22,7 +23,6 @@ const Product = mongoose.model("Product", productSchema)
 //on va récupérer toutes les sauces
 function getSauces(req, res){
     //si l'user est authentifié on fait un Product.find
-    console.log("le token a été validé, nous sommes getSauces")
     //on va récupérer les produits (products)
         Product.find({})
         .then(products => res.send( products ))
@@ -43,17 +43,10 @@ function deleteSauce(req, res) {
     const id = req.params.id
     //1-la suppression est envoyé à mongo, la base de donnée
     Product.findByIdAndDelete(id)
-    //2-supprimer les images localement, il envoie le message a "deleteImage"
-            .then(deleteImage)
-    //3-on envoie un message au site web
             .then((product) => sendClientResponse (product, res))
+            .then((item) => deleteImage(item)) // product c'est la réponse de fibdById...
+            .then((res)=> console.log("FILE DELETED", res))
             .catch((err) => res.status(500).send({message: err}))
-}
-
-function deleteImage(product) {
-    const imageUrl = product.imageUrl
-    const fileToDelete = imageUrl.split("/").at(-1)
-    return unlink(`images/${fileToDelete}`).then(() => product)
 }
 
 function modifySauce(req, res) {
@@ -62,17 +55,21 @@ function modifySauce(req, res) {
         params: {id}
     } = req
 
-    console.log("req.file ", req.file)
-
     const hasNewImage = req.file !=null // est ce que req.file est dif de null
     const payload = makePayload(hasNewImage, req)
 
-    // si dans le body on a une propriété sauce dif ou égal à null, on parse le contenu et on met à lintérieur de la variable sauce
-    // on va modifier la base de donnée
-
     Product.findByIdAndUpdate (id, payload)
-    .then((product) => sendClientResponse (product, res))
+    .then((dbResponse) => sendClientResponse (dbResponse, res))
+    .then((product) => deleteImage(product)) // product c'est la réponse de fibdById...
+    .then((res)=> console.log("FILE DELETED", res))
     .catch((err) => console.error ("PROBLEM UPDATING:", err))
+}
+
+function deleteImage(product) {
+    if (product == null) return
+    console.log("DELETE IMAGE", product)
+    const imageToDelete = product.imageUrl.split("/").at(-1)
+    return unlink("images/" + imageToDelete)
 }
 
 function makePayload (hasNewImage, req) {
@@ -91,7 +88,9 @@ function sendClientResponse (product, res) {
         return res.status(404).send ({ message: "Object not found in database" })
     }
         console.log ("ALL GOOD, UPDATING:", product)
-        res.status(200).send ({ message: "Successfully updated" })
+        return Promise.resolve(res.status(200).send ({ message: "Successfully updated" }))
+        .then(() => product // on retourne une promise de produit
+        )
 }
 
 function makeImageUrl(req, fileName) {
