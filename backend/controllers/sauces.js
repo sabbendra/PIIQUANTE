@@ -32,14 +32,17 @@ function getSauceById(req, res) {
     console.log(req.params)
     const id = req.params.id
     Product.findById(id)
-            .then(product =>  {
-            console.log("prod avec cet id:", product)
-            res.send(product)
-            })
+            .then(product =>  res.send(product))
             .catch(console.error)              
 }
        
-
+function deleteSauce(req, res) {
+    const id = req.params.id
+    Product.findByIdAndDelete(id)
+    
+            .then((product) =>  res.send({message: product}))
+            .catch(err => res.status(500).send({message: err}))
+}
 //pour créer une sauce, res c'est la réponse qu'on reçoit
 function createSauces(req, res){
 const { body, file } = req
@@ -74,6 +77,6 @@ function makeImageUrl(req, fileName) {
  })
  .catch(console.error)
 }
-module.exports = { getSauces, createSauces, getSauceById } 
+module.exports = { getSauces, createSauces, getSauceById, deleteSauce } 
 
 

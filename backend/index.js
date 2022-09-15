@@ -7,7 +7,7 @@ require("./mongo") // on a besoin de lancer le fichier mongo
 
 //Controllers, les contrôles
 const { createUser, logUser } = require("./controllers/users")
-const { getSauces, createSauces, getSauceById } = require("./controllers/sauces")
+const { getSauces, createSauces, getSauceById, deleteSauce } = require("./controllers/sauces")
 
 //middleware
 const { upload }  = require("./middleware/multer")
@@ -20,6 +20,7 @@ app.post("/api/auth/login", logUser)
 app.get("/api/sauces", authenticateUser, getSauces)
 //apres l'authentification, on va récupérer un fichier image et ensuite on va créer une sauce
 app.post("/api/sauces", authenticateUser, upload.single("image"), createSauces)
+app.delete("/api/sauces/:id", authenticateUser, deleteSauce)
 app.get("/api/sauces/:id", authenticateUser, getSauceById)
 
 app.get("/", (req, res) => res.send("hello world"))
