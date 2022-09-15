@@ -18,7 +18,7 @@ async function createUser(req, res) {
     }
   }
 
-  function hashPassword(password){
+  function hashPassword(password) {
     const saltRounds = 10;
     return bcrypt.hash(password, saltRounds)
   }
