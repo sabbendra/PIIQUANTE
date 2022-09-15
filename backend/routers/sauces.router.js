@@ -9,7 +9,7 @@ saucesRouter.get("/", authenticateUser, getSauces)
 //apres l'authentification, on va récupérer un fichier image et ensuite on va créer une sauce
 saucesRouter.post("/", authenticateUser, upload.single("image"), createSauces)
 saucesRouter.get("/:id", authenticateUser, getSauceById)
-saucesRouter.delete(":id", authenticateUser, deleteSauce)
+saucesRouter.delete("/:id", authenticateUser, deleteSauce)
 saucesRouter.put("/:id", authenticateUser, upload.single("image"), modifySauce)
 
 module.exports = {saucesRouter}
