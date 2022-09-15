@@ -49,6 +49,7 @@ function deleteSauce(req, res) {
 }
 
 function deleteImage(product) {
+    
     const imageUrl = product.imageUrl
     const fileToDelete = imageUrl.split("/").at(-1)
     unlink(`images/${fileToDelete}`,(err) => {
