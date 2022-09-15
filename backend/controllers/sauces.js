@@ -1,5 +1,7 @@
 //pour vérifier le token
 const mongoose = require("mongoose")
+//pour supprimer l'image en local
+const {unlink} = require ("fs")
 
 const productSchema = new mongoose.Schema({
     userId: { type: String, required: true },
@@ -38,11 +40,23 @@ function getSauceById(req, res) {
        
 function deleteSauce(req, res) {
     const id = req.params.id
+
     Product.findByIdAndDelete(id)
-    
-            .then((product) =>  res.send({message: product}))
+    // supprimer les images dans la base de donnée, il envoie le message a "deleteImage"
+            .then(deleteImage)
+            .then(product => res.send({message: product}))
             .catch(err => res.status(500).send({message: err}))
 }
+
+function deleteImage(product) {
+    const imageUrl = product.imageUrl
+    const fileToDelete = imageUrl.split("/").at(-1)
+    unlink(`images/${fileToDelete}`,(err) => {
+        console.log ("problème à la suppression de l'image", err)
+    })
+    return product
+}
+ 
 //pour créer une sauce, res c'est la réponse qu'on reçoit
 function createSauces(req, res){
 const { body, file } = req
