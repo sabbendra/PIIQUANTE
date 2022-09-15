@@ -16,13 +16,16 @@ const { authenticateUser } = require("./middleware/auth")
 //routes
 app.post("/api/auth/signup", createUser) 
 app.post("/api/auth/login", logUser)
+
 //authenticateUser est un middlew il se loge entre la requête et la réponse
 app.get("/api/sauces", authenticateUser, getSauces)
 //apres l'authentification, on va récupérer un fichier image et ensuite on va créer une sauce
 app.post("/api/sauces", authenticateUser, upload.single("image"), createSauces)
-app.delete("/api/sauces/:id", authenticateUser, deleteSauce)
-app.put("/api/sauces/:id", authenticateUser, upload.single("image"), modifySauce)
 app.get("/api/sauces/:id", authenticateUser, getSauceById)
+
+app.delete("/api/sauces/:id", authenticateUser, deleteSauce)
+
+app.put("/api/sauces/:id", authenticateUser, upload.single("image"), modifySauce)
 
 app.get("/", (req, res) => res.send("hello world"))
 

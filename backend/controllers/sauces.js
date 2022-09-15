@@ -62,12 +62,27 @@ function modifySauce(req, res) {
         params: {id}
     } = req
 
-    const {body} = req
+    console.log("req.file ", req.file)
+
+    const hasNewImage = req.file !=null // est ce que req.file est dif de null
+    const payload = makePayload(hasNewImage, req)
+
     // si dans le body on a une propriété sauce dif ou égal à null, on parse le contenu et on met à lintérieur de la variable sauce
     // on va modifier la base de donnée
-    Product.findByIdAndUpdate (id, body)
+
+    Product.findByIdAndUpdate (id, payload)
     .then((product) => sendClientResponse (product, res))
     .catch((err) => console.error ("PROBLEM UPDATING:", err))
+}
+
+function makePayload (hasNewImage, req) {
+    console.log("hasNewImage:", hasNewImage)
+    if(!hasNewImage) return req.body
+    const payload = JSON.parse(req.body.sauce)
+    payload.imageUrl = makeImageUrl(req, req.file.fileName)
+    console.log("Nouvelle img à gérer")
+    console.log("voici le payload:", payload)
+    return payload
 }
 
 function sendClientResponse (product, res) {
@@ -79,6 +94,10 @@ function sendClientResponse (product, res) {
         res.status(200).send ({ message: "Successfully updated" })
 }
 
+function makeImageUrl(req, fileName) {
+    return req.protocol + "://" + req.get("host") + "/images/" + fileName
+ }
+
 //pour créer une sauce, res c'est la réponse qu'on reçoit
 function createSauces(req, res){
 const { body, file } = req
@@ -89,9 +108,6 @@ const sauce = JSON.parse(req.body.sauce) // AJOUT DE REQ
 console.log("sauce", sauce)
 const { name, manufacturer, description, mainPepper, heat, userId } = sauce
 
-function makeImageUrl(req, fileName) {
-   return req.protocol + "://" + req.get("host") + "/images/" + fileName
-}
  const product = new Product({
     userId: userId,
     name: name,
