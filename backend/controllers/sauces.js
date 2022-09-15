@@ -46,7 +46,7 @@ function deleteSauce(req, res) {
     //2-supprimer les images localement, il envoie le message a "deleteImage"
             .then(deleteImage)
     //3-on envoie un message au site web
-            .then((product) => res.send({message: product}))
+            .then((product) => sendClientResponse (product, res))
             .catch((err) => res.status(500).send({message: err}))
 }
 
@@ -55,7 +55,30 @@ function deleteImage(product) {
     const fileToDelete = imageUrl.split("/").at(-1)
     return unlink(`images/${fileToDelete}`).then(() => product)
 }
- 
+
+function modifySauce(req, res) {
+    //on va récupérer l'id
+    const {
+        params: {id}
+    } = req
+
+    const {body} = req
+    // si dans le body on a une propriété sauce dif ou égal à null, on parse le contenu et on met à lintérieur de la variable sauce
+    // on va modifier la base de donnée
+    Product.findByIdAndUpdate (id, body)
+    .then((product) => sendClientResponse (product, res))
+    .catch((err) => console.error ("PROBLEM UPDATING:", err))
+}
+
+function sendClientResponse (product, res) {
+    if (product == null) {
+        console.log ("NOTHING TO UPDATING")
+        return res.status(404).send ({ message: "Object not found in database" })
+    }
+        console.log ("ALL GOOD, UPDATING:", product)
+        res.status(200).send ({ message: "Successfully updated" })
+}
+
 //pour créer une sauce, res c'est la réponse qu'on reçoit
 function createSauces(req, res){
 const { body, file } = req
@@ -90,6 +113,6 @@ function makeImageUrl(req, fileName) {
  })
  .catch(console.error)
 }
-module.exports = { getSauces, createSauces, getSauceById, deleteSauce } 
+module.exports = { getSauces, createSauces, getSauceById, deleteSauce, modifySauce } 
 
 
