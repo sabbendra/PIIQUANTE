@@ -129,13 +129,12 @@ const { name, manufacturer, description, mainPepper, heat, userId } = sauce
 }
 
 function likeSauces(req,res) {
-  const like = req.body.like
-  const userId = req.body.userId
+  const {like, userId} = req.body
 
     console.log("like, userId:", like, userId)
     // like peut être égal à 0,1 ou -1 donc si like est différent de tout ça on arrête
     //si le like est différent de 0,-1,1 on retourne une valeur 400 avec un message
-    if (![0, -1, 1].includes(like)) return res.stauts(400).send({message: "Invalid like value"})
+    if (![1, -1, 0].includes(like)) return res.stauts(400).send({message: "Invalid like value"})
     
 
     getSauce(req,res)
@@ -145,15 +144,24 @@ function likeSauces(req,res) {
 
     function updateVote(product, like, userId) {
         if(like === 1) incrementLike(product, userId)
-        //if(like === 1) incrementLike(product, userId)
-        //if(like === 1) incrementLike(product, userId)
+        if(like === -1) decrementLike(product, userId)
+        //if(like === 0) resetVote(product, userId)
+        //product.save()
     }
     
     function incrementLike(product, userId) {
-        const {usersLiked}= product
-        if(usersLiked.includes(userId)) return
+        const { usersLiked }= product
+        if (usersLiked.includes(userId)) return
         usersLiked.push(userId)
         product.likes++
+    }
+
+    function decrementLike(product, userId) {
+        const {usersDisLiked}= product
+        if(usersDisLiked.includes(userId)) return
+        usersDisLiked.push(userId)
+        product.dislikes++
+        console.log("produt dislike after: ", product)
     }
 
 module.exports = { getSauces, createSauces, getSauceById, deleteSauce, modifySauce, likeSauces } 
