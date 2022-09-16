@@ -12,10 +12,10 @@ const productSchema = new mongoose.Schema({
     mainPepper: { type: String, required: true },
     imageUrl: { type: String, required: true }, 
     heat: { type: Number, required: true },
-    likes: { type: Number, default:0 },
-    dislikes: { type: Number, default:0 },
-    usersLiked: { type:[String], required: false },
-    usersDisliked: { type:[String], required: false }
+    likes: Number,
+    dislikes: Number,
+    usersLiked: [String],
+    usersDisliked: [String]
 })
 
 const Product = mongoose.model("Product", productSchema)
@@ -25,19 +25,20 @@ function getSauces(req, res){
     //si l'user est authentifié on fait un Product.find
     //on va récupérer les produits (products)
         Product.find({})
-        .then(products => res.send( products ))
-        .catch(error => res.status(500).send(error))
-     
+        .then((products) => res.send(products))
+        .catch((error) => res.status(500).send(error))
+}
+
+function getSauce(req, res) {
+    const {id} = req.params
+    return Product.findById(id)
 }
 
 function getSauceById(req, res) { 
-    console.log(req.params)
-    const id = req.params.id
-    Product.findById(id)
-            .then(product =>  res.send(product))
-            .catch(console.error)              
+    getSauce(req,res)
+    .then((product) => sendClientResponse (product, res))
+    .catch((err) => res.status(500).send(err))         
 }
-
 
 function deleteSauce(req, res) {
     const id = req.params.id
@@ -88,7 +89,7 @@ function sendClientResponse (product, res) {
         return res.status(404).send ({ message: "Object not found in database" })
     }
         console.log ("ALL GOOD, UPDATING:", product)
-        return Promise.resolve(res.status(200).send ({ message: "Successfully updated" }))
+        return Promise.resolve(res.status(200).send (product))
         .then(() => product // on retourne une promise de produit
         )
 }
@@ -122,12 +123,39 @@ const { name, manufacturer, description, mainPepper, heat, userId } = sauce
  })
  product
  .save()
- .then((message) => {
-    res.status(201).send({ message: message });
-    return console.log("produit enregisté", message)
- })
- .catch(console.error)
+ .then((message) => res.status(201).send({ message: message }))
+    .catch((err) => res.status(500).send( err ))
+ 
 }
-module.exports = { getSauces, createSauces, getSauceById, deleteSauce, modifySauce } 
+
+function likeSauces(req,res) {
+  const like = req.body.like
+  const userId = req.body.userId
+
+    console.log("like, userId:", like, userId)
+    // like peut être égal à 0,1 ou -1 donc si like est différent de tout ça on arrête
+    //si le like est différent de 0,-1,1 on retourne une valeur 400 avec un message
+    if (![0, -1, 1].includes(like)) return res.stauts(400).send({message: "Invalid like value"})
+    
+
+    getSauce(req,res)
+    .then((product) => updateVote(product, like, userId))
+    .catch((err) => res.status(500).send(err))
+    }
+
+    function updateVote(product, like, userId) {
+        if(like === 1) incrementLike(product, userId)
+        //if(like === 1) incrementLike(product, userId)
+        //if(like === 1) incrementLike(product, userId)
+    }
+    
+    function incrementLike(product, userId) {
+        const {usersLiked}= product
+        if(usersLiked.includes(userId)) return
+        usersLiked.push(userId)
+        product.likes++
+    }
+
+module.exports = { getSauces, createSauces, getSauceById, deleteSauce, modifySauce, likeSauces } 
 
 

@@ -1,6 +1,7 @@
 const {app, express} = require("./server") //on importe app et express
 const {saucesRouter} = require("./routers/sauces.router")
 const {authRouter} = require("./routers/auth.router")
+const bodyParser = require("body-parser")
 const port = 3000
 const path = require("path")//permet de cloner deux chemins ensemble
 
@@ -8,6 +9,7 @@ const path = require("path")//permet de cloner deux chemins ensemble
 require("./mongo") // on a besoin de lancer le fichier mongo
 
 //Middleware
+app.use(bodyParser.json())
 app.use("/api/sauces", saucesRouter)
 app.use("/api/auth", authRouter)
 
