@@ -1,9 +1,9 @@
 const {app, express} = require("./server") //on importe app et express
 const {saucesRouter} = require("./routers/sauces.router")
 const {authRouter} = require("./routers/auth.router")
-const bodyParser = require("body-parser")
 const port = 3000
 const path = require("path")//permet de cloner deux chemins ensemble
+const bodyParser = require("body-parser")
 
 //connection à datebase
 require("./mongo") // on a besoin de lancer le fichier mongo

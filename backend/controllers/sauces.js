@@ -89,8 +89,7 @@ function sendClientResponse (product, res) {
         return res.status(404).send ({ message: "Object not found in database" })
     }
         console.log ("ALL GOOD, UPDATING:", product)
-        return Promise.resolve(res.status(200).send (product))
-        .then(() => product) // on retourne une promise de produit
+        return Promise.resolve(res.status(200).send (product)).then(() => product) // on retourne une promise de produit
 }
 
 function makeImageUrl(req, fileName) {
@@ -171,7 +170,6 @@ function incrementVote(product, userId, like) {
         like === 1 ? ++product.likes : ++product.dislikes
         return product 
     }
-
 
 module.exports = { getSauces, createSauces, getSauceById, deleteSauce, modifySauce, likeSauces } 
 
