@@ -30,7 +30,7 @@ function getSauces(req, res){
 }
 
 function getSauce(req, res) {
-    const {id} = req.params
+    const { id } = req.params
     return Product.findById(id)
 }
 
@@ -90,8 +90,7 @@ function sendClientResponse (product, res) {
     }
         console.log ("ALL GOOD, UPDATING:", product)
         return Promise.resolve(res.status(200).send (product))
-        .then(() => product // on retourne une promise de produit
-        )
+        .then(() => product) // on retourne une promise de produit
 }
 
 function makeImageUrl(req, fileName) {
@@ -99,13 +98,10 @@ function makeImageUrl(req, fileName) {
  }
 
 //pour créer une sauce, res c'est la réponse qu'on reçoit
-function createSauces(req, res){
+function createSauces(req, res) {
 const { body, file } = req
-console.log({body, file})
 const { fileName } = file
-
-const sauce = JSON.parse(req.body.sauce) // AJOUT DE REQ
-console.log("sauce", sauce)
+const sauce = JSON.parse(body.sauce) // AJOUT DE REQ
 const { name, manufacturer, description, mainPepper, heat, userId } = sauce
 
  const product = new Product({
@@ -129,40 +125,50 @@ const { name, manufacturer, description, mainPepper, heat, userId } = sauce
 }
 
 function likeSauces(req,res) {
-  const {like, userId} = req.body
-
-    console.log("like, userId:", like, userId)
+  const { like, userId } = req.body
     // like peut être égal à 0,1 ou -1 donc si like est différent de tout ça on arrête
     //si le like est différent de 0,-1,1 on retourne une valeur 400 avec un message
-    if (![1, -1, 0].includes(like)) return res.stauts(400).send({message: "Invalid like value"})
+    if (![1, -1, 0].includes(like)) return res.stauts(403).send({message: "Invalid like value"})
     
-
     getSauce(req,res)
-    .then((product) => updateVote(product, like, userId))
+    .then((product) => updateVote(product, like, userId, res))
+    .then(pr => pr.save())
+    .then(prod => sendClientResponse(prod, res))
     .catch((err) => res.status(500).send(err))
     }
 
-    function updateVote(product, like, userId) {
-        if(like === 1) incrementLike(product, userId)
-        if(like === -1) decrementLike(product, userId)
-        //if(like === 0) resetVote(product, userId)
-        //product.save()
-    }
-    
-    function incrementLike(product, userId) {
-        const { usersLiked }= product
-        if (usersLiked.includes(userId)) return
-        usersLiked.push(userId)
-        product.likes++
+function updateVote(product, like, userId, res) {
+        if(like === 1 || like === -1) return incrementVote(product, userId, like)
+        return resetVote(product, userId, res)
     }
 
-    function decrementLike(product, userId) {
-        const {usersDisLiked}= product
-        if(usersDisLiked.includes(userId)) return
-        usersDisLiked.push(userId)
-        product.dislikes++
-        console.log("produt dislike after: ", product)
+function resetVote(product, userId, res) {
+    const { usersLiked, usersDisliked } = product
+    if([usersLiked, usersDisliked].every((arr) => arr.includes(userId))) 
+        return Promise.reject("User seems to have voted both ways")
+
+    if (![usersLiked, usersDisliked].some((arr) => arr.includes(userId))) 
+        return Promise.reject("User seems to not have voted")
+
+    usersLiked.includes(userId) ? --product.likes : --product.dislikes
+
+    let arrayToUpdate = usersLiked.includes(userId) ? usersLiked : usersDisliked
+    const arrayWithoutUser = arrayToUpdate.filter(id => id !== userId)
+    arrayToUpdate = arrayWithoutUser
+    return product
+}
+    
+function incrementVote(product, userId, like) {
+        const { usersLiked, usersDisliked } = product
+
+        const votersArray = like === 1 ? usersLiked : usersDisliked // ça sera soit disliked ou liked en fonction de si c'est -1 ou 1                                                                          
+        if (votersArray.includes(userId)) return product
+        votersArray.push(userId)
+
+        like === 1 ? ++product.likes : ++product.dislikes
+        return product 
     }
+
 
 module.exports = { getSauces, createSauces, getSauceById, deleteSauce, modifySauce, likeSauces } 
 
