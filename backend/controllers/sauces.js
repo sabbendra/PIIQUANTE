@@ -143,6 +143,7 @@ function updateVote(product, like, userId, res) {
     }
 
 function resetVote(product, userId, res) {
+    console.log("reset before", product)
     const { usersLiked, usersDisliked } = product
     if([usersLiked, usersDisliked].every((arr) => arr.includes(userId))) 
         return Promise.reject("User seems to have voted both ways")
@@ -152,9 +153,12 @@ function resetVote(product, userId, res) {
 
     usersLiked.includes(userId) ? --product.likes : --product.dislikes
 
-    let arrayToUpdate = usersLiked.includes(userId) ? usersLiked : usersDisliked
-    const arrayWithoutUser = arrayToUpdate.filter(id => id !== userId)
-    arrayToUpdate = arrayWithoutUser
+    if (usersLiked.includes(userId)) {
+        product.usersLiked = product.usersLiked.filter((id) => id !== userId)
+    }else {
+        product.usersDisliked = product.usersDisliked.filter((id) => id !== userId)
+    }
+    console.log("reset after", product)
     return product
 }
     
