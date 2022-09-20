@@ -1,7 +1,6 @@
-//pour vérifier le token
+//on importe mongoose pour interrargir avec la base de donnée
 const mongoose = require("mongoose")
 //pour supprimer l'image en local
-//const unlink = require ("fs").promises.unlink
 const {unlink} = require ("fs/promises")
 
 const productSchema = new mongoose.Schema({
@@ -131,8 +130,8 @@ function likeSauces(req,res) {
     
     getSauce(req,res)
     .then((product) => updateVote(product, like, userId, res))
-    .then(pr => pr.save())
-    .then(prod => sendClientResponse(prod, res))
+    .then((pr) => pr.save())
+    .then((prod) => sendClientResponse(prod, res))
     .catch((err) => res.status(500).send(err))
     }
 
