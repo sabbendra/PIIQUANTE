@@ -1,13 +1,14 @@
 const multer = require("multer")
-
+//on va l'enregistrer dans le disque
 const storage = multer.diskStorage({
-    //on va dans le dossier image
+    //on enregistrer les images dans le dossier image
     destination: "images/",
     filename: function(req,file,cb) {
         cb(null, makeFilename(req, file))
     }
 })
 
+// c'est le dossier de l'image
 function makeFilename(req,file) {
     //on retourne un nom de fichier
     //const fileName = Date.now() + file.originalname.split("").join("")replace(/\s/g,"-")

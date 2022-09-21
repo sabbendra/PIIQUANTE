@@ -4,12 +4,13 @@ const bcrypt = require("bcrypt")
 const jwt = require ("jsonwebtoken")
 
 async function createUser(req, res) {
+  //On va hacher le mot de passe avec 10 tours)
     try {
     const { email, password } = req.body
     const hashedPassword = await hashPassword(password)
     console.log("password:", password)
     console.log("hashedPassword:", hashedPassword)
-
+  //on créé le nouvel utilisateur    
     const user = new User({ email, password: hashedPassword })
     await user.save()
         res.status(201).send({message: "Utilisateur enregistré !"})
@@ -28,7 +29,7 @@ async function createUser(req, res) {
     const email = req.body.email
     const password = req.body.password
     
-    //pour trouver une personne qui correspond a cet email dans la base de donnée
+    //pour trouver une personne qui correspond à cet email dans la base de donnée
     const user = await User.findOne({ email: email })
     console.log(user)
     const isPasswordOk = await bcrypt.compare(password, user.password)
