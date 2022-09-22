@@ -91,17 +91,6 @@ function sendClientResponse (product, res) {
         return Promise.resolve(res.status(200).send (product)).then(() => product) // on retourne une promise de produit
 }
 
-/*function sendClientResponse (product, res) {
-    if (product == null) {
-        console.log ("NOTHING TO UPDATING")
-        return res.status(404).send ({ message: "Object not found in database" })
-    }
-        console.log ("ALL GOOD, UPDATING:", product)
-        return res.status(200).send(product) // on retourne une promise de produit
-    }
-*/
-
-
 function makeImageUrl(req, fileName) {
     return req.protocol + "://" + req.get("host") + "/images/" + fileName
  }
