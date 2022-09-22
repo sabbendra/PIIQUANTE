@@ -1,7 +1,7 @@
 //on importe mongoose pour interrargir avec la base de donnée
 const mongoose = require("mongoose")
 //pour supprimer l'image en local
-const {unlink} = require ("fs/promises")
+const {unlink} = require ("fs/promises") 
 
 const productSchema = new mongoose.Schema({
     userId: { type: String, required: true },
@@ -40,11 +40,11 @@ function getSauceById(req, res) {
 }
 
 function deleteSauce(req, res) {
-    const id = req.params.id
+    const {id} = req.params
     //1-la suppression est envoyé à mongo, la base de donnée
     Product.findByIdAndDelete(id)
             .then((product) => sendClientResponse (product, res))
-            .then((item) => deleteImage(item)) // product c'est la réponse de fibdById...
+            .then((item) => deleteImage(item)) // product c'est la réponse de findById...
             .then((res)=> console.log("FILE DELETED", res))
             .catch((err) => res.status(500).send({message: err}))
 }
@@ -58,15 +58,15 @@ function modifySauce(req, res) {
     const hasNewImage = req.file !=null // est ce que req.file est dif de null
     const payload = makePayload(hasNewImage, req)
 
-    Product.findByIdAndUpdate (id, payload)
-    .then((dbResponse) => sendClientResponse (dbResponse, res))
+    Product.findByIdAndUpdate (id, payload)//on va chercher le produit qu'il faut modifier
+    .then((dbResponse) => sendClientResponse (dbResponse, res))//on a trouvé un produi ou pas
     .then((product) => deleteImage(product)) // product c'est la réponse de fibdById...
     .then((res)=> console.log("FILE DELETED", res))
     .catch((err) => console.error ("PROBLEM UPDATING:", err))
 }
 
 function deleteImage(product) {
-    if (product == null) return
+    if (product == null) return // si le produit est égal à null, on ne fait rien
     console.log("DELETE IMAGE", product)
     const imageToDelete = product.imageUrl.split("/").at(-1)
     return unlink("images/" + imageToDelete)
