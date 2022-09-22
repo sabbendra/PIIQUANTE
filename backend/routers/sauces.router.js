@@ -6,7 +6,7 @@ const saucesRouter = express.Router ()
 const bodyParser = require("body-parser")
 
 /////demander à Rudy si nécessaire ou pas ???
-//saucesRouter.use(bodyParser.json)
+saucesRouter.use(bodyParser.json)
 
 //authenticateUser est un middlew il se loge entre la requête et la réponse
 saucesRouter.get("/", authenticateUser, getSauces)
