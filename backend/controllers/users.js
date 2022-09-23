@@ -1,6 +1,8 @@
 //on importe user depuis mongo
 const {User} = require ("../mongo")//on veut le User dans le fichier mongo
+//on importe le package bcrypt destiné à hascher le mot de passe afin de se prémunir des attaques par force brut
 const bcrypt = require("bcrypt")
+//on importe le package jwt destié à attribuer un token d'identification lors de la connexion
 const jwt = require ("jsonwebtoken")
 
 async function createUser(req, res) {
@@ -32,6 +34,7 @@ async function createUser(req, res) {
     //pour trouver une personne qui correspond à cet email dans la base de donnée
     const user = await User.findOne({ email: email })
     console.log(user)
+    //on compare le mot de passe avec le hash si ce n'est pas ok on envoie un 403
     const isPasswordOk = await bcrypt.compare(password, user.password)
     //si le password n'est pas bon on envoie un 403
     if(!isPasswordOk){
@@ -44,9 +47,11 @@ async function createUser(req, res) {
     res.status(500).send({ message: "Erreur interne" })
   }
 }
-
+  
+  // utilisation de jwt pour obtenir un token encodé
   function createToken(email) {
     const jwtPassword = process.env.JWT_PASSWORD
+    //le token à une durée de validité de 24h
     return jwt.sign({ email: email }, jwtPassword, { expiresIn: "24h"})
   }
 

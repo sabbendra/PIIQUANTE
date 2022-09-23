@@ -1,4 +1,4 @@
-const {app, express} = require("./server") //on importe app et express
+const {app, express} = require("./server") //on importe app et express pour l'utiliser sur le serveur
 const {saucesRouter} = require("./routers/sauces.router")
 const {authRouter} = require("./routers/auth.router")
 const port = 3000

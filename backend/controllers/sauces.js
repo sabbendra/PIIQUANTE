@@ -1,7 +1,7 @@
 //on importe mongoose pour interrargir avec la base de donnée
 const mongoose = require("mongoose")
-//pour supprimer l'image en local
-const {unlink} = require ("fs/promises") //pour supprimer l'image
+//Importation du module Node "file system" de Node qui va nous permettre de gérer le téléchargement, la modification et a suppression d'images.
+const {unlink} = require ("fs/promises") 
 
 const productSchema = new mongoose.Schema({
     userId: { type: String, required: true },
@@ -32,24 +32,26 @@ function getSauce(req, res) {
     const { id } = req.params
     return Product.findById(id)
 }
-
+  //Fonction qui permet de récupérer une seule sauce
 function getSauceById(req, res) { 
     getSauce(req,res)
     .then((product) => sendClientResponse (product, res))
     .catch((err) => res.status(500).send(err))         
 }
 
+  //Fonction qui permet de supprimer une sauce
 function deleteSauce(req, res) {
     const {id} = req.params
     //1-la suppression est envoyé à mongo, la base de donnée
-    Product.findByIdAndDelete(id) //méthode pour deleter un objet
+    Product.findByIdAndDelete(id) //méthode pour deleter un objet si il a été trouvé dans la base de donnée
             .then((product) => sendClientResponse (product, res))
             .then((res)=> console.log("ce produit a été supprimé", res))
             .then((item) => deleteImage(item)) // product c'est la réponse de findById...
-            //.then((res)=> console.log("FILE DELETED", res))
+            .then((res)=> console.log("FILE DELETED", res))
             .catch((err) => res.status(500).send({message: err}))
 }
-
+  
+  //Fonction qui permet de modifier une sauce
 function modifySauce(req, res) {
     //on va récupérer l'id
     const {
@@ -60,16 +62,17 @@ function modifySauce(req, res) {
     const payload = makePayload(hasNewImage, req)
 
     Product.findByIdAndUpdate (id, payload)//on va chercher le produit qu'il faut modifier
-    .then((dbResponse) => sendClientResponse (dbResponse, res))//on a trouvé un produi ou pas
-    .then((product) => deleteImage(product)) // product c'est la réponse de fibdById...
+    .then((dbResponse) => sendClientResponse (dbResponse, res))//on a trouvé un produit ou pas
+    .then((product) => deleteImage(product)) // product c'est la réponse de findById...
     .then((res)=> console.log("FILE DELETED", res))
     .catch((err) => console.error ("PROBLEM UPDATING:", err))
 }
 
+  //Fonction qui permet de supprimer l'image d'une sauce
 function deleteImage(product) {
     if (product == null) return // si le produit est égal à null, on ne fait rien
     console.log("DELETE IMAGE", product)
-    const imageToDelete = product.imageUrl.split("/").at(-1)//on recupère nom du fichier pour sup
+    const imageToDelete = product.imageUrl.split("/").at(-1)//on a besoin nom du fichier pour sup
     return unlink("images/" + imageToDelete)
 }
 
@@ -122,7 +125,7 @@ const { name, manufacturer, description, mainPepper, heat, userId } = sauce
     .catch((err) => res.status(500).send( err ))
  
 }
-
+  //Fonction qui permet de liker ou disliker une sauce
 function likeSauces(req,res) {
   const { like, userId } = req.body
     // like peut être égal à 0,1 ou -1 donc si like est différent de tout ça on arrête

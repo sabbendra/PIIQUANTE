@@ -1,3 +1,4 @@
+//on importe le package dotenv afin de sécuriser certaines données sensibles liées aux mdp
 require("dotenv").config()
 const express = require("express")
 const app = express()
