@@ -1,7 +1,7 @@
 //on importe mongoose pour interrargir avec la base de donnée
 const mongoose = require("mongoose")
 //pour supprimer l'image en local
-const {unlink} = require ("fs/promises") 
+const {unlink} = require ("fs/promises") //pour supprimer l'image
 
 const productSchema = new mongoose.Schema({
     userId: { type: String, required: true },
@@ -69,7 +69,7 @@ function modifySauce(req, res) {
 function deleteImage(product) {
     if (product == null) return // si le produit est égal à null, on ne fait rien
     console.log("DELETE IMAGE", product)
-    const imageToDelete = product.imageUrl.split("/").at(-1)
+    const imageToDelete = product.imageUrl.split("/").at(-1)//on recupère nom du fichier pour sup
     return unlink("images/" + imageToDelete)
 }
 
