@@ -42,10 +42,11 @@ function getSauceById(req, res) {
 function deleteSauce(req, res) {
     const {id} = req.params
     //1-la suppression est envoyé à mongo, la base de donnée
-    Product.findByIdAndDelete(id)
+    Product.findByIdAndDelete(id) //méthode pour deleter un objet
             .then((product) => sendClientResponse (product, res))
+            .then((res)=> console.log("ce produit a été supprimé", res))
             .then((item) => deleteImage(item)) // product c'est la réponse de findById...
-            .then((res)=> console.log("FILE DELETED", res))
+            //.then((res)=> console.log("FILE DELETED", res))
             .catch((err) => res.status(500).send({message: err}))
 }
 
