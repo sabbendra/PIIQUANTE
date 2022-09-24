@@ -9,6 +9,7 @@ saucesRouter.use(bodyParser.json())
 //authenticateUser est un middlew il se loge entre la requête et la réponse
 saucesRouter.get("/", authenticateUser, getSauces)
 //apres l'authentification, on va récupérer un fichier image et ensuite on va créer une sauce
+//upload vient du middlewar multer qui gère le fichier image
 saucesRouter.post("/", authenticateUser, upload.single("image"), createSauces)
 saucesRouter.get("/:id", authenticateUser, getSauceById)
 saucesRouter.delete("/:id", authenticateUser, deleteSauce)

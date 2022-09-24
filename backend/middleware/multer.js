@@ -11,13 +11,13 @@ const storage = multer.diskStorage({
 // c'est le dossier de l'image
 function makeFilename(req,file) {
     //on retourne un nom de fichier
-    //const fileName = Date.now() + file.originalname.split("").join("")replace(/\s/g,"-")
+    //on nomme le fichier
     const fileName = `${Date.now()}-${file.originalname}`.replace(/\s/g, "-") 
     //on transforme la requete pour la réutiliser
     file.fileName = fileName
     return fileName
 }
-const upload = multer({ storage: storage })
+const upload = multer({ storage: storage })// prend l'argument storage(stockage)
 
 //on a besoin d'exporter seulement upload
 module.exports = { upload }
