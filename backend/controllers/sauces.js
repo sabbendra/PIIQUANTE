@@ -49,7 +49,7 @@ function deleteSauce(req, res) {
             .then((res)=> console.log("FILE DELETED", res))
             .catch((err) => res.status(500).send({message: err}))
 }
-  
+ 
 //Fonction qui permet de modifier une sauce
 function modifySauce(req, res) {
     //on va récupérer l'id dans les params qui est dans la requête
@@ -85,8 +85,10 @@ function makePayload (hasNewImage, req) { // on a besoin de la nouvelle image et
 //c'est la fonction qui va renvoyer la réponse au client, on check dans la database le produit trouvé ou non
 function sendClientResponse (product, res) {
     if (product == null) { // si la réponse est null, on envoi un message
+        console.log("Nothing to update")
         return res.status(404).send ({ message: "Object not found in database" })
     }   //si la réponse est réussie on envoi un statut 200 
+        console.log("All good, updating:", product)
         return Promise.resolve(res.status(200).send (product)).then(() => product) // on retourne une promise de produit
 }
 
