@@ -20,7 +20,8 @@ async function createUser(req, res) {
         res.status(409).send({message: "User non enregistré :" + err})
     }
   }
-
+  
+  //on créé une fonction qui va crypter le mot de passe à partir d'un password
   function hashPassword(password) {
     const saltRounds = 10;
     return bcrypt.hash(password, saltRounds)

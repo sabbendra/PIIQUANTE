@@ -17,6 +17,7 @@ const productSchema = new mongoose.Schema({
     usersDisliked: [String]
 })
 
+//Quel model on va utilisé et on lui attribue un nom
 const Product = mongoose.model("Product", productSchema)
 
 //on va récupérer toutes les sauces
