@@ -41,7 +41,7 @@ async function createUser(req, res) {
     if(!isPasswordOk){
         res.status(403).send({ message: "Mot de passe incorrect"})
     }
-    const token = createToken(email)
+    const token = createToken(email, user)
     res.status(200).send({ userId: user?._id, token: token})    
   } catch (err) {
     console.error(err)
@@ -50,10 +50,10 @@ async function createUser(req, res) {
 }
   
   // utilisation de jwt pour obtenir un token encodé
-  function createToken(email) {
+  function createToken(email, user) {
     const jwtPassword = process.env.JWT_PASSWORD
     //le token à une durée de validité de 24h
-    return jwt.sign({ email: email }, jwtPassword, { expiresIn: "24h"})
+    return jwt.sign({ email: email, userId: user?._id ?? null },jwtPassword, { expiresIn: "24h"})
   }
 
   module.exports = { createUser, logUser }

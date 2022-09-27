@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 //Importation du module Node "file system" de Node qui va nous permettre de gérer le téléchargement, la modification et a suppression d'images.
 const {unlink} = require ("fs/promises") 
 
+
 const productSchema = new mongoose.Schema({
     userId: { type: String, required: true },
     name: { type: String, required: true },
@@ -42,15 +43,19 @@ function getSauceById(req, res) {
 }
 
 //Fonction qui permet de supprimer une sauce
+
 function deleteSauce(req, res) {
     const {id} = req.params
-    Product.findByIdAndDelete(id) //méthode mongoose pour deleter un objet si il a été trouvé dans la base de donnée
-            .then((product) => sendClientResponse (product, res))
-            .then((item) => deleteImage(item)) // suppréssion du produit localement
-            .then((res)=> console.log("FILE DELETED", res))
+        Product.findByIdAndDelete(id)
+            .then((product) => { 
+                if (product.userId != process.userId) return res.status(401).json({ message: "Action non autorisée." })
+                return sendClientResponse (product, res)})
+            .then((item) => deleteImage (item))
+            .then((res) => console.log ("file deleted", res))
             .catch((err) => res.status(500).send({message: err}))
-}
- 
+    }
+
+
 //Fonction qui permet de modifier une sauce
 function modifySauce(req, res) {
     //on va récupérer l'id dans les params qui est dans la requête
@@ -62,17 +67,20 @@ function modifySauce(req, res) {
     const payload = makePayload(hasNewImage, req)
     //on va chercher le produit qu'il faut modifier, on va lui passer l'id et le payload
     Product.findByIdAndUpdate (id, payload)
-    .then((dbResponse) => sendClientResponse (dbResponse, res))//on a trouvé un produit ou pas dans la database
+
+    .then((dbResponse) => { 
+        if (dbResponse.userId != process.userId) return res.status(401).json({ message: "Action non autorisée." })
+        return sendClientResponse (dbResponse, res)})//on a trouvé un produit ou pas dans la database
     .then((product) => deleteImage(product)) //si le sendClientResponse est ok, on delete l'image
     .then((res)=> console.log("FILE DELETED", res))
     .catch((err) => console.error ("PROBLEM UPDATING:", err))
 }
 
 //Fonction qui permet de supprimer l'image d'une sauce
-function deleteImage(product) {
-    if (product == null) return // si le produit n'est pas  ds la BD, on ne fait rien
-    const imageToDelete = product.imageUrl.split("/").at(-1)//on a besoin nom du fichier pour sup
-    return unlink("images/" + imageToDelete) // on va sup l'image dans le dossier image et on fait un return dans deleteImage
+function deleteImage(sauce) {
+   // if (product == null) return // si le produit n'est pas  ds la BD, on ne fait rien
+    const linkImage = sauce?.imageUrl?.split("/").at(-1) ?? '';//on a besoin nom du fichier pour sup
+    return unlink("images/" + linkImage); // on va sup l'image dans le dossier image et on fait un return dans deleteImage
 }
 
 //pour définir le payload (qui est dif du body)
@@ -86,10 +94,10 @@ function makePayload (hasNewImage, req) { // on a besoin de la nouvelle image et
 //c'est la fonction qui va renvoyer la réponse au client, on check dans la database le produit trouvé ou non
 function sendClientResponse (product, res) {
     if (product == null) { // si la réponse est null, on envoi un message
-        console.log("Nothing to update")
+        //console.log("Nothing to update")
         return res.status(404).send ({ message: "Object not found in database" })
     }   //si la réponse est réussie on envoi un statut 200 
-        console.log("All good, updating:", product)
+        //console.log("All good, updating:", product)
         return Promise.resolve(res.status(200).send (product)).then(() => product) // on retourne une promise de produit
 }
 
@@ -182,4 +190,4 @@ function incrementVote(product, userId, like) {
 
 module.exports = { getSauces, createSauces, getSauceById, deleteSauce, modifySauce, likeSauces } 
 
-
+    
